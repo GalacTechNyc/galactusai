@@ -169,7 +169,7 @@
 <body>
   <button onclick="toggleSidebar()" class="fixed top-4 left-4 z-50 p-2 bg-purple-700 text-white rounded">📁 Saved Convos</button>
 
-  <div id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-gray-900 p-4 shadow-xl -translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
+  <div id="sidebar" class="fixed top-16 left-1/2 transform -translate-x-1/2 w-[90%] max-w-3xl bg-gray-900 p-4 shadow-xl rounded-lg z-50 overflow-y-auto hidden">
     <h2 class="text-xl font-bold mb-4 text-white">💾 Saved Conversations</h2>
     <button onclick="startNewConversation()" class="mb-4 w-full p-2 bg-green-600 text-white rounded">🆕 New Conversation</button>
     <div id="savedList" class="space-y-4"></div>
@@ -330,8 +330,10 @@
     // Sidebar and conversation saving/loading logic
     function toggleSidebar() {
       const sidebar = document.getElementById("sidebar");
-      sidebar.classList.toggle("-translate-x-full");
-      loadSavedConversations();
+      sidebar.classList.toggle("hidden");
+      if (!sidebar.classList.contains("hidden")) {
+        loadSavedConversations();
+      }
     }
 
     function saveConversation() {
@@ -395,10 +397,3 @@
   </script>
 </body>
 </html>
-    function startNewConversation() {
-      conversationHistory.length = 0;
-      document.getElementById('conversationLog').innerHTML = '';
-      document.getElementById('aiReply').innerHTML = '';
-      document.getElementById('promptInput').value = '';
-      alert("✨ New conversation started!");
-    }
