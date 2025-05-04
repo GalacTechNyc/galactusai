@@ -57,6 +57,8 @@ p {
   justify-content: center;
 }
 
+/* Commented out existing buttons to avoid duplicates */
+/*
 .button {
   padding: 1rem 2rem;
   background: #2e2e4d;
@@ -72,6 +74,7 @@ p {
   background: #5a00b2;
   transform: scale(1.05);
 }
+*/
 
 .orb {
   position: absolute;
@@ -162,10 +165,28 @@ pre code {
   backdrop-filter: blur(6px);
   transition: all 0.3s ease-in-out;
   border-right: 2px solid rgba(138, 43, 226, 0.3);
+  padding: 1rem;
+}
+
+/* Added Close button inside sidebar */
+#sidebar > button {
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: white;
+  background-color: #dc2626;
+  border: none;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#sidebar > button:hover {
+  background-color: #b91c1c;
 }
 
 /* Sidebar Buttons */
-#sidebar button {
+#sidebar button:not(:first-child) {
   background: linear-gradient(135deg, #5a00b2, #0077ff);
   border: none;
   padding: 0.5rem 1rem;
@@ -178,7 +199,7 @@ pre code {
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-#sidebar button:hover {
+#sidebar button:not(:first-child):hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
