@@ -17,5 +17,8 @@
     "url": "https://github.com/GalacTechNyc/galactusai/issues"
   },
   "homepage": "https://github.com/GalacTechNyc/galactusai#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "openai": "^4.97.0"
+  }
 }
