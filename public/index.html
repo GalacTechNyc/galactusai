@@ -194,14 +194,24 @@
     }
 
     function saveConversation() {
-      const input = prompt("Enter a quick summary title for this convo:");
-      if (!input) return;
+      // Use first user message as title if no custom title is entered
+      const firstUserMessage = conversationHistory.find(msg => msg.role === 'user');
+      if (!firstUserMessage) {
+        alert("No user prompt found to create title.");
+        return;
+      }
+      let input = firstUserMessage.content.trim();
+      input = input.length > 30 ? input.slice(0, 30).trim() + "..." : input;
 
-      const tags = prompt("Enter tags separated by commas:");
-      const tagArray = tags ? tags.split(',').map(t => t.trim()) : [];
+      // Get tags from input field, not prompt
+      const tagInput = document.getElementById("tagsInput");
+      let tagArray = [];
+      if (tagInput && tagInput.value.trim().length > 0) {
+        tagArray = tagInput.value.split(',').map(t => t.trim()).filter(t => t.length > 0);
+      }
 
       const convo = {
-        title: input.length > 30 ? input.slice(0, 30) + "..." : input,
+        title: input,
         tags: tagArray,
         history: conversationHistory,
         timestamp: new Date().toISOString()
@@ -223,12 +233,41 @@
         const div = document.createElement("div");
         div.className = "p-2 bg-gray-800 rounded text-white";
         div.innerHTML = `
-          <div class="font-bold">${item.title}</div>
+          <div class="flex items-center gap-2 mb-1">
+            <input class="font-bold bg-transparent text-white editable-title w-full" value="${item.title}" data-index="${index}" disabled />
+            <button class="edit-title-button bg-yellow-500 hover:bg-yellow-600 text-black text-xs px-2 py-1 rounded">✏️</button>
+          </div>
           <div class="text-xs text-gray-400">${new Date(item.timestamp).toLocaleString()}</div>
           <div class="text-xs mt-1">${item.tags.map(t => `<span class="bg-purple-700 px-2 py-1 rounded mr-1">#${t}</span>`).join(" ")}</div>
           <button onclick="restoreConvo(${index})" class="mt-2 text-sm bg-blue-600 px-2 py-1 rounded">↩️ Restore</button>
         `;
         container.appendChild(div);
+        const inputField = div.querySelector('.editable-title');
+        const editBtn = div.querySelector('.edit-title-button');
+
+        editBtn.addEventListener('click', () => {
+          if (inputField.disabled) {
+            inputField.disabled = false;
+            inputField.focus();
+            editBtn.textContent = '💾';
+          } else {
+            const newTitle = inputField.value.trim();
+            if (newTitle.length > 0) {
+              const updated = JSON.parse(localStorage.getItem("galactus_convos") || "[]");
+              updated[index].title = newTitle;
+              localStorage.setItem("galactus_convos", JSON.stringify(updated));
+              const saveIcon = document.createElement('span');
+              saveIcon.textContent = '✅';
+              saveIcon.style.marginLeft = '0.5rem';
+              saveIcon.style.fontSize = '0.85rem';
+              saveIcon.style.color = '#0f0';
+              inputField.insertAdjacentElement('afterend', saveIcon);
+              setTimeout(() => saveIcon.remove(), 1500);
+            }
+            inputField.disabled = true;
+            editBtn.textContent = '✏️';
+          }
+        });
       });
     }
 
