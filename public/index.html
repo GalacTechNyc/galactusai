@@ -26,7 +26,7 @@
   <div class="parallax-layer mid"></div>
   <div class="parallax-layer front"></div>
   <div class="container">
-    <h1>GalactusAI</h1>
+    <h1 data-text="GalactusAI">GalactusAI</h1>
     <p>Ready to build or reflect?</p>
     <div class="buttons">
       <button class="button">Create Something</button>
@@ -48,7 +48,6 @@
     <p>Initializing consciousness layer...</p>
     <button onclick="document.getElementById('easterEggModal').style.display='none'" style="margin-top:1rem; background:#2e2e4d; color:white; padding:0.5rem 1rem; border:none; border-radius:8px;">Close</button>
   </div>
-</script>
   <audio id="galaxyAudio" loop autoplay>
     <source src="https://cdn.pixabay.com/audio/2022/10/30/audio_b80f6d6be4.mp3" type="audio/mpeg" />
   </audio>
@@ -74,6 +73,17 @@
     document.querySelector('.orb').addEventListener('click', () => {
       const modal = document.getElementById('easterEggModal');
       modal.style.display = 'block';
+    });
+    // === 3‑D tilt effect on the central container ===
+    const containerElem = document.querySelector('.container');
+    document.addEventListener('mousemove', (e) => {
+      const { innerWidth: w, innerHeight: h } = window;
+      const x = (e.clientX - w / 2) / (w / 2);
+      const y = (e.clientY - h / 2) / (h / 2);
+      containerElem.style.transform = `rotateX(${y * 6}deg) rotateY(${x * 6}deg)`;
+    });
+    document.addEventListener('mouseout', () => {
+      containerElem.style.transform = '';
     });
     const audio = document.getElementById('galaxyAudio');
     // Toggles
@@ -125,7 +135,33 @@
     typeBootLog();
 
     // Conversation history for GalactusAI
-    const conversationHistory = [];
+    let conversationHistory = JSON.parse(localStorage.getItem('galactus_live_history') || '[]');
+
+    function persistHistory() {
+      localStorage.setItem('galactus_live_history', JSON.stringify(conversationHistory));
+    }
+
+    function messageToHTML(msg) {
+      let content = msg.content;
+      const codeBlockMatch = content.match(/```(?:\w+)?\n([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        const codeOnly = codeBlockMatch[1];
+        content = content.split('```')[0].trim() + '<br/><pre><code class="language-js">' + codeOnly + '</code></pre>';
+      }
+      content = content.replace(/\n/g, '<br/>');
+      return `<div style="margin-bottom:1rem;"><strong>${msg.role === 'user' ? '👤 You' : '🤖 GalactusAI'}:</strong><br/>${content}</div>`;
+    }
+
+    (function renderExistingHistory() {
+      if (!conversationHistory.length) return;
+      const logDiv = document.getElementById('conversationLog');
+      const aiReplyDiv = document.getElementById('aiReply');
+      logDiv.innerHTML = conversationHistory.map(messageToHTML).join('');
+      hljs.highlightAll();
+      logDiv.scrollTop = logDiv.scrollHeight;
+      const last = conversationHistory[conversationHistory.length - 1];
+      if (last && last.role === 'assistant') aiReplyDiv.innerHTML = last.content;
+    })();
     document.getElementById('submitPrompt').addEventListener('click', async () => {
       const input = document.getElementById('promptInput').value;
       const replyDiv = document.getElementById('aiReply');
@@ -134,6 +170,7 @@
       if (!input.trim()) return;
 
       conversationHistory.push({ role: 'user', content: input });
+      persistHistory();
       document.getElementById('promptInput').value = '';
       replyDiv.innerHTML = '🌌 Processing...';
 
@@ -151,6 +188,7 @@
         const data = await res.json();
         const replyText = data.reply || 'No response received.';
         conversationHistory.push({ role: 'assistant', content: replyText });
+        persistHistory();
 
         // Typing animation
         replyDiv.innerHTML = '';
@@ -224,6 +262,7 @@
 
     function startNewConversation() {
       conversationHistory.length = 0;
+      localStorage.removeItem('galactus_live_history');
       document.getElementById('conversationLog').innerHTML = '';
       document.getElementById('aiReply').innerHTML = '';
       document.getElementById('promptInput').value = '';
