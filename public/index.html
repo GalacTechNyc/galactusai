@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
   <script src="stars.js" defer></script>
-  <script type="module" src="/useChatStore.js"></script>
 </head>
 <body>
   <div id="sidebar-controls">
@@ -291,36 +290,6 @@
         hljs.highlightAll();
       }
     }
-
-    import { useChatStore } from '/useChatStore.js';
-
-    const { history: localHistory, setHistory: setLocalHistory } = useChatStore();
-
-    // Rehydrate local history to UI
-    window.addEventListener('DOMContentLoaded', () => {
-      if (localHistory.length > 0) {
-        conversationHistory.push(...localHistory);
-        const logDiv = document.getElementById('conversationLog');
-        logDiv.innerHTML = localHistory.map(msg => {
-          let content = msg.content;
-          const codeBlockMatch = content.match(/```(?:\w+)?\n([\s\S]*?)```/);
-          if (codeBlockMatch) {
-            const codeOnly = codeBlockMatch[1];
-            content = content.split('```')[0].trim() + '<br/><pre><code class="language-js">' + codeOnly + '</code></pre>';
-          }
-          content = content.replace(/\n/g, '<br/>');
-          return `<div style="margin-bottom:1rem;"><strong>${msg.role === 'user' ? '👤 You' : '🤖 GalactusAI'}:</strong><br/>${content}</div>`;
-        }).join('');
-        hljs.highlightAll();
-      }
-    });
-
-    // Extend saveConversation to sync to local store
-    const originalSave = saveConversation;
-    saveConversation = function () {
-      originalSave();
-      setLocalHistory([...conversationHistory]);
-    };
   </script>
 </body>
 </html>
