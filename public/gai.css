@@ -143,12 +143,24 @@ pre code {
 
 /* Sidebar */
 #sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 320px;
   background: rgba(10, 10, 20, 0.95);
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+  box-shadow: 2px 0 15px rgba(0, 255, 255, 0.2);
   backdrop-filter: blur(6px);
-  transition: all 0.3s ease-in-out;
-  border-right: 2px solid rgba(138, 43, 226, 0.3);
+  transition: transform 0.3s ease-in-out;
+  transform: translateX(-100%);
+  z-index: 999;
   padding: 1rem;
+  overflow-y: auto;
+  border-right: 2px solid rgba(138, 43, 226, 0.3);
+}
+
+#sidebar.show {
+  transform: translateX(0%);
 }
 
 /* Added Close button inside sidebar */
@@ -236,13 +248,38 @@ input:focus {
 }
 
 
-/* Fixed left sidebar control buttons */
 #sidebar-controls {
   position: fixed;
   top: 1rem;
   left: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  align-items: flex-start;
+  gap: 0.75rem;
   z-index: 100;
+}
+
+#sidebar-controls button {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+#sidebar-controls button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+#sidebar-controls button:first-child {
+  background-color: #6a0dad;
+  color: white;
+}
+
+#sidebar-controls button:last-child {
+  background-color: #28a745;
+  color: white;
 }

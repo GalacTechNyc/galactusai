@@ -10,12 +10,12 @@
   <script src="stars.js" defer></script>
 </head>
 <body>
-  <div class="fixed top-4 left-4 z-50 flex flex-col gap-2">
-    <button onclick="toggleSidebar()" class="p-2 bg-purple-700 text-white rounded">📁 Saved</button>
-    <button onclick="startNewConversation()" class="p-2 bg-green-600 text-white rounded">🆕 New</button>
+  <div id="sidebar-controls">
+    <button onclick="toggleSidebar()">📁 Saved</button>
+    <button onclick="startNewConversation()">🆕 New</button>
   </div>
 
-  <div id="sidebar" class="fixed top-0 left-0 h-full w-80 bg-gray-900 p-4 shadow-xl z-50 overflow-y-auto hidden">
+  <div id="sidebar" class="sidebar">
     <button onclick="toggleSidebar()" class="mb-2 text-sm text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded">✖ Close</button>
     <h2 class="text-xl font-bold mb-4 text-white">💾 Saved Conversations</h2>
     <div id="savedList" class="space-y-4"></div>
@@ -176,8 +176,8 @@
     // Sidebar and conversation saving/loading logic
     function toggleSidebar() {
       const sidebar = document.getElementById("sidebar");
-      sidebar.classList.toggle("hidden");
-      if (!sidebar.classList.contains("hidden")) {
+      const isVisible = sidebar.classList.toggle("show");
+      if (isVisible) {
         loadSavedConversations();
       }
     }
@@ -188,8 +188,8 @@
       document.getElementById('aiReply').innerHTML = '';
       document.getElementById('promptInput').value = '';
       const sidebar = document.getElementById("sidebar");
-      if (!sidebar.classList.contains("hidden")) {
-        sidebar.classList.add("hidden");
+      if (sidebar.classList.contains("show")) {
+        sidebar.classList.remove("show");
       }
     }
 
