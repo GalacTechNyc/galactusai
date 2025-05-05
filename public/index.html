@@ -16,9 +16,8 @@
   </div>
 
   <div id="sidebar" class="fixed top-0 left-0 h-full w-80 bg-gray-900 p-4 shadow-xl z-50 overflow-y-auto hidden">
+    <button onclick="toggleSidebar()" class="mb-2 text-sm text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded">✖ Close</button>
     <h2 class="text-xl font-bold mb-4 text-white">💾 Saved Conversations</h2>
-    <button onclick="toggleSidebar()" class="mb-4 text-sm text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded">✖ Close</button>
-    <button onclick="startNewConversation()" class="mb-4 w-full p-2 bg-green-600 text-white rounded">🆕 New Conversation</button>
     <div id="savedList" class="space-y-4"></div>
   </div>
 
