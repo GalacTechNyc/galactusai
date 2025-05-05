@@ -11,19 +11,7 @@ body {
   min-height: 100vh;
   overflow-y: auto;
   position: relative;
-}
-
-body::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url('https://raw.githubusercontent.com/JulianLaval/canvas-starfield/master/starfield.png') repeat;
-  opacity: 0.1;
-  z-index: 1;
-  pointer-events: none;
+  perspective: 1200px;
 }
 
 .container {
@@ -34,15 +22,6 @@ body::before {
   padding: 2rem;
   background-color: rgba(30, 30, 60, 0.1);
   backdrop-filter: blur(10px);
-}
-
-h1 {
-  font-size: 2.8rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  background: linear-gradient(to right, #8a2be2, #00ffff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 p {
@@ -282,4 +261,170 @@ input:focus {
 #sidebar-controls button:last-child {
   background-color: #28a745;
   color: white;
+}
+/* ---- Base button tweaks ---- */
+.button {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.25);
+  transition: color 0.25s ease;
+}
+.button:hover {
+  color: #ffffff;
+}
+/* ---------- Light / Day Theme ---------- */
+body.light {
+  background: #f5faff;
+  color: #222;
+}
+
+body.light .container {
+  background-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 30px rgba(138, 43, 226, 0.08);
+}
+
+body.light #sidebar {
+  background: rgba(250, 250, 255, 0.94);
+  border-right-color: rgba(138, 43, 226, 0.25);
+}
+
+body.light #sidebar button:not(:first-child) {
+  background: linear-gradient(135deg, #7a12e2, #0066ff);
+}
+
+body.light h1 {
+  background: linear-gradient(to right, #7a12e2, #0066ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ---------- Responsive Layout ---------- */
+@media (max-width: 768px) {
+  .container {
+    width: 92%;
+    padding: 1.5rem;
+  }
+  #sidebar {
+    width: 260px;
+  }
+  #sidebar-controls {
+    gap: 0.5rem;
+  }
+}
+
+/* ---------- Smooth Custom Scrollbar ---------- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25);
+}
+::-webkit-scrollbar-thumb {
+  background: #5a00b2;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6b00d8;
+}
+
+/* ---------- Button Accessibility ---------- */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #8a2be2;
+  outline-offset: 2px;
+}
+/* =========================================================
+   🔥 Cosmic Upgrade Pack — May 2025
+   Animated nebula backdrop, glitch header, neon buttons,
+   and tilt‑ready container styling.
+   ========================================================= */
+
+/* ---- Animated Space Gradient Background ---- */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(130deg, #350048, #001b35, #350048);
+  background-size: 400% 400%;
+  animation: spaceShift 15s ease-in-out infinite;
+  z-index: -2;
+  filter: blur(6px);
+}
+@keyframes spaceShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ---- Glitch Header ---- */
+h1[data-text] {
+  position: relative;
+  font-size: 3.2rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 800;
+  color: #fff;
+}
+h1[data-text]::before,
+h1[data-text]::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  overflow: hidden;
+}
+h1[data-text]::before {
+  color: #ff00c8;
+  animation: glitchTop 2.5s steps(20) infinite;
+}
+h1[data-text]::after {
+  color: #00fff7;
+  animation: glitchBottom 3s steps(20) infinite;
+}
+@keyframes glitchTop {
+  0%  { clip-path: inset(0 0 90% 0); }
+  10% { clip-path: inset(0 0 15% 0); transform: translate(-2px, -2px); }
+  50% { clip-path: inset(0 0 25% 0); }
+  90% { clip-path: inset(0 0 50% 0); transform: translate(2px, 2px); }
+  100%{ clip-path: inset(0 0 90% 0); }
+}
+@keyframes glitchBottom {
+  0%  { clip-path: inset(90% 0 0 0); }
+  10% { clip-path: inset(15% 0 0 0); transform: translate(2px,2px); }
+  50% { clip-path: inset(75% 0 0 0); }
+  90% { clip-path: inset(50% 0 0 0); transform: translate(-2px,-2px); }
+  100%{ clip-path: inset(90% 0 0 0); }
+}
+
+/* ---- Neon‑Glow Buttons ---- */
+.button {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+  transition: color 0.3s;
+}
+.button::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(130deg, #ff00c8, #00fff7, #ff00c8);
+  background-size: 200% 200%;
+  animation: buttonGlow 4s linear infinite;
+  z-index: -1;
+  filter: blur(6px);
+}
+.button:hover::before {
+  animation-duration: 1.5s;
+}
+@keyframes buttonGlow {
+  0%   { background-position: 0 0; }
+  50%  { background-position: 100% 100%; }
+  100% { background-position: 0 0; }
+}
+
+/* ---- Tilt Container Transition ---- */
+.container {
+  transition: transform 0.2s ease-out;
 }

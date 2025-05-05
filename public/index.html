@@ -53,12 +53,45 @@
     <source src="https://cdn.pixabay.com/audio/2022/10/30/audio_b80f6d6be4.mp3" type="audio/mpeg" />
   </audio>
   <button id="audioToggle" style="position:fixed; top:20px; right:20px; z-index:1000; background:#2e2e4d; color:white; border:none; padding:0.5rem 1rem; border-radius:8px; cursor:pointer;">🔊</button>
+  <button id="speechToggle" style="position:fixed; top:60px; right:20px; z-index:1000; background:#2e2e4d; color:white; border:none; padding:0.5rem 1rem; border-radius:8px; cursor:pointer;">🗣️</button>
+  <button id="themeToggle"  style="position:fixed; top:100px; right:20px; z-index:1000; background:#2e2e4d; color:white; border:none; padding:0.5rem 1rem; border-radius:8px; cursor:pointer;">🌓</button>
   <script>
+    // === Quality‑of‑life enhancements ===
+    const promptInput = document.getElementById('promptInput');
+
+    // Auto‑resize textarea
+    promptInput.addEventListener('input', function () {
+      this.style.height = 'auto';
+      this.style.height = `${this.scrollHeight}px`;
+    });
+
+    // Submit with ⌘/Ctrl + Enter
+    promptInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+        document.getElementById('submitPrompt').click();
+      }
+    });
     document.querySelector('.orb').addEventListener('click', () => {
       const modal = document.getElementById('easterEggModal');
       modal.style.display = 'block';
     });
     const audio = document.getElementById('galaxyAudio');
+    // Toggles
+    const speechToggle = document.getElementById('speechToggle');
+    const themeToggle  = document.getElementById('themeToggle');
+    let   speechEnabled = false;
+
+    // Enable / disable text‑to‑speech
+    speechToggle.addEventListener('click', () => {
+      speechEnabled = !speechEnabled;
+      speechToggle.textContent = speechEnabled ? '🔇🗣️' : '🗣️';
+    });
+
+    // Light / dark theme switch
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light');
+      themeToggle.textContent = document.body.classList.contains('light') ? '🌞' : '🌓';
+    });
     const toggle = document.getElementById('audioToggle');
     toggle.addEventListener('click', () => {
       if (audio.paused) {
@@ -128,6 +161,13 @@
           }
         }
         typeReply(replyText);
+        // Speak the reply aloud if enabled and supported
+        if (speechEnabled && 'speechSynthesis' in window) {
+          speechSynthesis.cancel();                       // stop anything still speaking
+          const utter = new SpeechSynthesisUtterance(replyText);
+          utter.rate = 1;                                 // normal speed for clarity
+          speechSynthesis.speak(utter);
+        }
 
         // Display history log with syntax highlighting
         logDiv.innerHTML = conversationHistory.map(msg => {
@@ -292,4 +332,20 @@
     }
   </script>
 </body>
+<style>
+  body.light {
+    background:#f9f9f9;
+    color:#222;
+  }
+  body.light .container,
+  body.light .sidebar,
+  body.light .p-2 {
+    background:#ffffff;
+    color:#222;
+  }
+  body.light .button {
+    background:#2e2e4d;
+    color:#ffffff;
+  }
+</style>
 </html>
