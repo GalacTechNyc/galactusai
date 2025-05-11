@@ -29,8 +29,13 @@ export default async function handler(req, res) {
       const result = await geminiModel.generateContent({ contents: promptParts });
       console.log("🔮 Gemini raw result:", result);
       console.log("🔮 Gemini response:", result.response);
-      const reply = await result.response.text();
-      return res.status(200).json({ reply });
+      try {
+        const reply = await result.response.text();
+        return res.status(200).json({ reply });
+      } catch (err) {
+        console.error("❌ Failed to parse Gemini reply:", err);
+        return res.status(500).json({ error: "Gemini gave an invalid response." });
+      }
     } else {
       const completion = await openai.chat.completions.create({
         model: "gpt-4",

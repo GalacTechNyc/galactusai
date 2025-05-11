@@ -190,7 +190,7 @@
         });
 
         const data = await res.json();
-        const replyText = data.reply || 'No response received.';
+        const replyText = data.reply || (data.error ? `⚠️ ${data.error}` : 'No response received.');
         conversationHistory.push({ role: 'assistant', content: replyText });
         persistHistory();
 
