@@ -29,10 +29,6 @@
     <div class="container">
       <h1 data-text="GalactusAI">GalactusAI</h1>
       <p>Ready to build or reflect?</p>
-      <div class="buttons">
-        <button class="button">Create Something</button>
-        <button class="button">Reflect</button>
-      </div>
       <textarea id="promptInput" placeholder="Enter your cosmic question..." rows="4" style="width: 100%; padding: 1rem; margin-top: 1rem; border-radius: 8px; border: none;"></textarea>
       <button id="submitPrompt" class="button" style="margin-top: 1rem;">Submit to GalactusAI</button>
       
@@ -189,18 +185,20 @@
         conversationHistory.push({ role: 'assistant', content: replyText });
         persistHistory();
 
-        // Typing animation: append directly into conversationLog
-        const tempDiv = document.createElement('div');
-        tempDiv.style.marginBottom = '1rem';
-        tempDiv.innerHTML = `<strong>🤖 GalactusAI:</strong><br/><span id="animatedReply"></span>`;
-        logDiv.appendChild(tempDiv);
+        // Typing animation: append directly into conversationLog, always with a new container
+        const responseDiv = document.createElement('div');
+        responseDiv.style = 'background:#111;color:#0ff;padding:1rem;border-radius:12px 12px 12px 0;max-width:80%;margin-right:auto;margin-bottom:1rem;';
+        const replySpan = document.createElement('span');
+        responseDiv.appendChild(replySpan);
+        logDiv.appendChild(responseDiv);
         logDiv.scrollTop = logDiv.scrollHeight;
-
-        const animatedSpan = document.getElementById('animatedReply');
         function typeReply(text, i = 0) {
           if (i < text.length) {
-            animatedSpan.innerHTML += text.charAt(i);
+            replySpan.innerHTML += text.charAt(i);
             setTimeout(() => typeReply(text, i + 1), 30);
+          } else {
+            replySpan.innerHTML = text.replace(/\n/g, '<br/>');
+            logDiv.scrollTop = logDiv.scrollHeight;
           }
         }
         typeReply(replyText);
