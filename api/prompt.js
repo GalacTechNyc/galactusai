@@ -20,9 +20,13 @@ export default async function handler(req, res) {
 
   try {
     if (model === "gemini") {
-      const promptText = history.map((msg) => `${msg.role === "user" ? "You" : "AI"}: ${msg.content}`).join("\n");
+      console.log("🔮 Using Gemini model");
+      const promptParts = history.map((msg) => ({
+        role: msg.role === "user" ? "user" : "model",
+        parts: [{ text: msg.content }]
+      }));
       const geminiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
-      const result = await geminiModel.generateContent(promptText);
+      const result = await geminiModel.generateContent({ contents: promptParts });
       const reply = result.response.text();
       return res.status(200).json({ reply });
     } else {

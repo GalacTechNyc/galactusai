@@ -173,7 +173,7 @@
       document.getElementById('promptInput').value = '';
       // Render the user message immediately
       const userDiv = document.createElement('div');
-      userDiv.style = 'background:#2e2e4d;color:#fff;padding:1rem;border-radius:12px 12px 0 12px;max-width:80%;margin-left:auto;margin-bottom:1rem;';
+      userDiv.setAttribute('style', 'background:#2e2e4d;color:#fff;padding:1rem;border-radius:12px 12px 0 12px;max-width:80%;margin-left:auto;margin-bottom:1rem;');
       userDiv.innerHTML = input.replace(/\n/g, '<br/>');
       logDiv.appendChild(userDiv);
       logDiv.scrollTop = logDiv.scrollHeight;
@@ -196,7 +196,7 @@
 
         // Typing animation: append directly into conversationLog, always with a new container
         const responseDiv = document.createElement('div');
-        responseDiv.style = 'background:#111;color:#0ff;padding:1rem;border-radius:12px 12px 12px 0;max-width:80%;margin-right:auto;margin-bottom:1rem;';
+        responseDiv.setAttribute('style', 'background:#111;color:#0ff;padding:1rem;border-radius:12px 12px 12px 0;max-width:80%;margin-right:auto;margin-bottom:1rem;');
         const replySpan = document.createElement('span');
         responseDiv.appendChild(replySpan);
         logDiv.appendChild(responseDiv);
@@ -239,7 +239,7 @@
         console.error('GalactusAI Fetch Error:', err);
         // If error, show error message in conversation log
         const tempDiv = document.createElement('div');
-        tempDiv.style.marginBottom = '1rem';
+        tempDiv.setAttribute('style', 'margin-bottom:1rem;');
         tempDiv.innerHTML = `<strong>🤖 GalactusAI:</strong><br/><span style="color:red;">❌ Error contacting GalactusAI.</span>`;
         logDiv.appendChild(tempDiv);
       }
