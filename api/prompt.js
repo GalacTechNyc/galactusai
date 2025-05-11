@@ -27,7 +27,9 @@ export default async function handler(req, res) {
       }));
       const geminiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
       const result = await geminiModel.generateContent({ contents: promptParts });
-      const reply = result.response.text();
+      console.log("🔮 Gemini raw result:", result);
+      console.log("🔮 Gemini response:", result.response);
+      const reply = await result.response.text();
       return res.status(200).json({ reply });
     } else {
       const completion = await openai.chat.completions.create({
