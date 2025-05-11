@@ -34,7 +34,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ reply });
     }
   } catch (err) {
-    console.error("❌ GalactusAI API error:", err.message);
-    return res.status(500).json({ error: "GalactusAI failed to respond." });
+    console.error("❌ GalactusAI API error:", err);
+    return res.status(500).json({ error: err.message || "GalactusAI failed to respond." });
   }
 }
