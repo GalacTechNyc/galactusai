@@ -106,14 +106,41 @@ p {
   to { transform: translate(-3%, 1%); }
 }
 
-pre code {
-  white-space: pre-wrap;
-  word-break: break-word;
-  display: block;
-  overflow-x: auto;
-  padding: 1rem;
+
+pre {
+  position: relative;
   background-color: #1f1f2e;
+  padding: 1rem;
   border-radius: 8px;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+
+pre code {
+  white-space: pre;
+  word-break: normal;
+  font-family: 'Fira Code', monospace;
+  color: #e0e0e0;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: #2e2e4d;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.copy-btn:hover {
+  opacity: 1;
 }
 
 .boot-console {

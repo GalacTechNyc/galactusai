@@ -36,7 +36,7 @@
       <textarea id="promptInput" placeholder="Enter your cosmic question..." rows="4" style="width: 100%; padding: 1rem; margin-top: 1rem; border-radius: 8px; border: none;"></textarea>
       <button id="submitPrompt" class="button" style="margin-top: 1rem;">Submit to GalactusAI</button>
       
-      <div id="conversationLog" style="margin-top: 2rem; text-align: left; max-width: 600px; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; overflow-y: hidden; max-height: 320px;"></div>
+      <div id="conversationLog" style="margin-top: 2rem; text-align: left; max-width: 600px; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; overflow-y: auto; max-height: 320px;"></div>
       <button id="scrollToBottom" class="button" style="margin-top: 1rem;">⬇️ Scroll to Latest</button>
       <button id="downloadLog" class="button" style="margin-top: 1rem;">📄 Download Conversation</button>
     </div>
@@ -56,7 +56,8 @@
   <button id="audioToggle" style="position:fixed; top:20px; right:20px; z-index:1000; background:#2e2e4d; color:white; border:none; padding:0.5rem 1rem; border-radius:8px; cursor:pointer;">🔊</button>
   <button id="speechToggle" style="position:fixed; top:60px; right:20px; z-index:1000; background:#2e2e4d; color:white; border:none; padding:0.5rem 1rem; border-radius:8px; cursor:pointer;">🗣️</button>
   <button id="themeToggle"  style="position:fixed; top:100px; right:20px; z-index:1000; background:#2e2e4d; color:white; border:none; padding:0.5rem 1rem; border-radius:8px; cursor:pointer;">🌓</button>
-  <button id="resetViewBtn" style="display:none;position:fixed;bottom:20px;right:20px;z-index:1000;background:#2e2e4d;color:white;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;">♻️ Reset View</button>
+  <button id="mode3DToggle" style="position:fixed; top:140px; right:20px; z-index:1000; background:#2e2e4d; color:white; border:none; padding:0.5rem 1rem; border-radius:8px; cursor:pointer;">🌀 3D</button>
+  <button id="resetViewBtn" style="display:none;position:fixed;bottom:100px;right:20px;z-index:1000;background:#2e2e4d;color:white;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;">♻️ Reset View</button>
   <script>
     // === Quality‑of‑life enhancements ===
     const promptInput = document.getElementById('promptInput');
@@ -135,15 +136,14 @@
 
     function messageToHTML(msg) {
       let content = msg.content;
-      const codeBlockMatch = content.match(/```(?:\w+)?\n([\s\S]*?)```/);
-      if (codeBlockMatch) {
-        const codeOnly = codeBlockMatch[1];
-        content = content.split('```')[0].trim() + '<br/><pre><code class="language-js">' + codeOnly + '</code></pre>';
-      }
+      // Improved code block formatting: highlight all code blocks, preserve multi-blocks, language-specific, and HTML safe
+      content = content.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang = 'plaintext', code) => {
+        return `<pre><button class="copy-btn" onclick="navigator.clipboard.writeText(\`${code.replace(/`/g, '\\`')}\`)">📋 Copy</button><code class="language-${lang}">${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+      });
       content = content.replace(/\n/g, '<br/>');
       const bubbleStyle = msg.role === 'user'
-        ? 'background:#2e2e4d;color:#fff;padding:1rem;border-radius:12px 12px 0 12px;max-width:80%;margin-left:auto;margin-bottom:1rem;'
-        : 'background:#111;color:#0ff;padding:1rem;border-radius:12px 12px 12px 0;max-width:80%;margin-right:auto;margin-bottom:1rem;';
+        ? 'background:#2e2e4d;color:#fff;padding:1rem;border-radius:12px 12px 0 12px;max-width:80%;margin-left:auto;margin-bottom:1rem;animation:pulseFadeIn 0.4s ease-out;'
+        : 'background:#111;color:#0ff;padding:1rem;border-radius:12px 12px 12px 0;max-width:80%;margin-right:auto;margin-bottom:1rem;animation:pulseFadeIn 0.4s ease-out;';
       return `<div style="${bubbleStyle}">${content}</div>`;
     }
 
@@ -171,6 +171,7 @@
       userDiv.style = 'background:#2e2e4d;color:#fff;padding:1rem;border-radius:12px 12px 0 12px;max-width:80%;margin-left:auto;margin-bottom:1rem;';
       userDiv.innerHTML = input.replace(/\n/g, '<br/>');
       logDiv.appendChild(userDiv);
+      logDiv.scrollTop = logDiv.scrollHeight;
 
       const apiURL = window.location.hostname.includes('localhost')
         ? 'http://localhost:5050/api/prompt'
@@ -193,6 +194,7 @@
         tempDiv.style.marginBottom = '1rem';
         tempDiv.innerHTML = `<strong>🤖 GalactusAI:</strong><br/><span id="animatedReply"></span>`;
         logDiv.appendChild(tempDiv);
+        logDiv.scrollTop = logDiv.scrollHeight;
 
         const animatedSpan = document.getElementById('animatedReply');
         function typeReply(text, i = 0) {
@@ -363,19 +365,7 @@
         const logDiv = document.getElementById('conversationLog');
         conversationHistory.length = 0;
         data[index].history.forEach(msg => conversationHistory.push(msg));
-        logDiv.innerHTML = conversationHistory.map(msg => {
-          let content = msg.content;
-          const codeBlockMatch = content.match(/```(?:\w+)?\n([\s\S]*?)```/);
-          if (codeBlockMatch) {
-            const codeOnly = codeBlockMatch[1];
-            content = content.split('```')[0].trim() + '<br/><pre><code class="language-js">' + codeOnly + '</code></pre>';
-          }
-          content = content.replace(/\n/g, '<br/>');
-          const bubbleStyle = msg.role === 'user'
-            ? 'background:#2e2e4d;color:#fff;padding:1rem;border-radius:12px 12px 0 12px;max-width:80%;margin-left:auto;margin-bottom:1rem;'
-            : 'background:#111;color:#0ff;padding:1rem;border-radius:12px 12px 12px 0;max-width:80%;margin-right:auto;margin-bottom:1rem;';
-          return `<div style="${bubbleStyle}">${content}</div>`;
-        }).join('');
+        logDiv.innerHTML = conversationHistory.map(messageToHTML).join('');
         hljs.highlightAll();
       }
     }
@@ -384,14 +374,28 @@
     const universe = document.getElementById('chatUniverse');
     // Global transformation tracker
     let rotationX = 0, rotationY = 0, rotationZ = 0, zoom = 1;
+
+    // 3D Mode Toggle state and button logic
+    let mode3DEnabled = true;
+    const mode3DToggle = document.getElementById('mode3DToggle');
+    const resetBtn = document.getElementById('resetViewBtn');
+    mode3DToggle.addEventListener('click', () => {
+      mode3DEnabled = !mode3DEnabled;
+      mode3DToggle.textContent = mode3DEnabled ? '🌀 3D' : '☁️ 2D';
+      if (!mode3DEnabled) {
+        containerElem.style.transform = '';
+        resetBtn.style.display = 'none';
+      }
+    });
+
     function updateTransform() {
+      if (!mode3DEnabled) return;
       containerElem.style.transform =
         `rotateX(${rotationX}deg) rotateY(${rotationY}deg) rotateZ(${rotationZ}deg) scale3d(${zoom}, ${zoom}, ${zoom})`;
       checkResetVisibility();
     }
 
     // --- Reset View Button logic ---
-    const resetBtn = document.getElementById('resetViewBtn');
     function checkResetVisibility() {
       const tiltMagnitude = Math.abs(rotationX) + Math.abs(rotationY) + Math.abs(rotationZ);
       if (tiltMagnitude > 10 || zoom < 0.95 || zoom > 1.05) {
@@ -426,6 +430,7 @@
     });
 
     universe.addEventListener('mousemove', (e) => {
+      if (!mode3DEnabled) return;
       if (!isDragging) return;
       const deltaX = e.clientX - lastMouseX;
       const deltaY = e.clientY - lastMouseY;
@@ -438,6 +443,7 @@
     });
 
     universe.addEventListener('wheel', (e) => {
+      if (!mode3DEnabled) return;
       e.preventDefault();
       zoom += e.deltaY > 0 ? -0.1 : 0.1;
       zoom = Math.max(0.3, Math.min(3, zoom));
@@ -473,6 +479,20 @@
   .container {
     transform-style: preserve-3d;
     transition: transform 0.2s ease-out;
+  }
+  @keyframes pulseFadeIn {
+    0% {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.02);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
 </style>
 </html>
