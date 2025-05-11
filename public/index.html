@@ -369,14 +369,17 @@
     }
     // === Enhanced 3D environment: rotateX/Y/Z with cumulative tracking and smooth zoom ===
     const containerElem = document.querySelector('.container');
+    // Immediately clear transform if 3D is off on load
+    let mode3DEnabled = false;
+    if (!mode3DEnabled) containerElem.style.transform = '';
     const universe = document.getElementById('chatUniverse');
     // Global transformation tracker
     let rotationX = 0, rotationY = 0, rotationZ = 0, zoom = 1;
 
     // 3D Mode Toggle state and button logic
-    let mode3DEnabled = true;
     const mode3DToggle = document.getElementById('mode3DToggle');
     const resetBtn = document.getElementById('resetViewBtn');
+    mode3DToggle.textContent = '☁️ 2D';
     mode3DToggle.addEventListener('click', () => {
       mode3DEnabled = !mode3DEnabled;
       mode3DToggle.textContent = mode3DEnabled ? '🌀 3D' : '☁️ 2D';
