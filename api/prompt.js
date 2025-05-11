@@ -27,8 +27,12 @@ export default async function handler(req, res) {
       }));
       const geminiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
       const result = await geminiModel.generateContent({ contents: promptParts });
-      console.log("🔮 Gemini raw result:", result);
-      console.log("🔮 Gemini response:", result.response);
+      console.log("🔮 Gemini FULL RESULT:", JSON.stringify(result, null, 2));
+
+      if (!result?.response?.text) {
+        return res.status(500).json({ error: "⚠️ Gemini returned an unexpected format." });
+      }
+
       try {
         const reply = await result.response.text();
         return res.status(200).json({ reply });
