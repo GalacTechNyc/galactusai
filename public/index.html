@@ -34,8 +34,8 @@
     </div>
     <textarea id="promptInput" placeholder="Enter your cosmic question..." rows="4" style="width: 100%; padding: 1rem; margin-top: 1rem; border-radius: 8px; border: none;"></textarea>
     <button id="submitPrompt" class="button" style="margin-top: 1rem;">Submit to GalactusAI</button>
-    <div id="aiReply" style="margin-top: 1rem; font-size: 1rem; color: #0ff;"></div>
-    <div id="conversationLog" style="margin-top: 2rem; text-align: left; max-width: 600px; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; overflow-y: auto; max-height: 320px;"></div>
+    
+    <div id="conversationLog" style="margin-top: 2rem; text-align: left; max-width: 600px; font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; overflow-y: hidden; max-height: 320px;"></div>
     <button id="scrollToBottom" class="button" style="margin-top: 1rem;">⬇️ Scroll to Latest</button>
     <button id="downloadLog" class="button" style="margin-top: 1rem;">📄 Download Conversation</button>
   </div>
@@ -73,17 +73,6 @@
     document.querySelector('.orb').addEventListener('click', () => {
       const modal = document.getElementById('easterEggModal');
       modal.style.display = 'block';
-    });
-    // === 3‑D tilt effect on the central container ===
-    const containerElem = document.querySelector('.container');
-    document.addEventListener('mousemove', (e) => {
-      const { innerWidth: w, innerHeight: h } = window;
-      const x = (e.clientX - w / 2) / (w / 2);
-      const y = (e.clientY - h / 2) / (h / 2);
-      containerElem.style.transform = `rotateX(${y * 6}deg) rotateY(${x * 6}deg)`;
-    });
-    document.addEventListener('mouseout', () => {
-      containerElem.style.transform = '';
     });
     const audio = document.getElementById('galaxyAudio');
     // Toggles
@@ -149,7 +138,10 @@
         content = content.split('```')[0].trim() + '<br/><pre><code class="language-js">' + codeOnly + '</code></pre>';
       }
       content = content.replace(/\n/g, '<br/>');
-      return `<div style="margin-bottom:1rem;"><strong>${msg.role === 'user' ? '👤 You' : '🤖 GalactusAI'}:</strong><br/>${content}</div>`;
+      const bubbleStyle = msg.role === 'user'
+        ? 'background:#2e2e4d;color:#fff;padding:1rem;border-radius:12px 12px 0 12px;max-width:80%;margin-left:auto;margin-bottom:1rem;'
+        : 'background:#111;color:#0ff;padding:1rem;border-radius:12px 12px 12px 0;max-width:80%;margin-right:auto;margin-bottom:1rem;';
+      return `<div style="${bubbleStyle}">${content}</div>`;
     }
 
     (function renderExistingHistory() {
@@ -158,13 +150,12 @@
       const aiReplyDiv = document.getElementById('aiReply');
       logDiv.innerHTML = conversationHistory.map(messageToHTML).join('');
       hljs.highlightAll();
-      logDiv.scrollTop = logDiv.scrollHeight;
-      const last = conversationHistory[conversationHistory.length - 1];
-      if (last && last.role === 'assistant') aiReplyDiv.innerHTML = last.content;
+      // logDiv.scrollTop = logDiv.scrollHeight;
+      // const last = conversationHistory[conversationHistory.length - 1];
+      // if (last && last.role === 'assistant') aiReplyDiv.innerHTML = last.content;
     })();
     document.getElementById('submitPrompt').addEventListener('click', async () => {
       const input = document.getElementById('promptInput').value;
-      const replyDiv = document.getElementById('aiReply');
       const logDiv = document.getElementById('conversationLog');
 
       if (!input.trim()) return;
@@ -172,7 +163,6 @@
       conversationHistory.push({ role: 'user', content: input });
       persistHistory();
       document.getElementById('promptInput').value = '';
-      replyDiv.innerHTML = '🌌 Processing...';
 
       const apiURL = window.location.hostname.includes('localhost')
         ? 'http://localhost:5050/api/prompt'
@@ -190,15 +180,21 @@
         conversationHistory.push({ role: 'assistant', content: replyText });
         persistHistory();
 
-        // Typing animation
-        replyDiv.innerHTML = '';
+        // Typing animation: append directly into conversationLog
+        const tempDiv = document.createElement('div');
+        tempDiv.style.marginBottom = '1rem';
+        tempDiv.innerHTML = `<strong>🤖 GalactusAI:</strong><br/><span id="animatedReply"></span>`;
+        logDiv.appendChild(tempDiv);
+
+        const animatedSpan = document.getElementById('animatedReply');
         function typeReply(text, i = 0) {
           if (i < text.length) {
-            replyDiv.innerHTML += text.charAt(i);
+            animatedSpan.innerHTML += text.charAt(i);
             setTimeout(() => typeReply(text, i + 1), 30);
           }
         }
         typeReply(replyText);
+
         // Speak the reply aloud if enabled and supported
         if (speechEnabled && 'speechSynthesis' in window) {
           speechSynthesis.cancel();                       // stop anything still speaking
@@ -207,24 +203,28 @@
           speechSynthesis.speak(utter);
         }
 
-        // Display history log with syntax highlighting
-        logDiv.innerHTML = conversationHistory.map(msg => {
-          let content = msg.content;
-          const codeBlockMatch = content.match(/```(?:\w+)?\n([\s\S]*?)```/);
-          if (codeBlockMatch) {
-            const codeOnly = codeBlockMatch[1];
-            content = content.split('```')[0].trim() + '<br/><pre><code class="language-js">' + codeOnly + '</code></pre>';
-          }
-          content = content.replace(/\n/g, '<br/>');
-          return `<div style="margin-bottom:1rem;"><strong>${msg.role === 'user' ? '👤 You' : '🤖 GalactusAI'}:</strong><br/>${content}</div>`;
-        }).join('');
+        // Display history log with syntax highlighting (if needed elsewhere)
+        // logDiv.innerHTML = conversationHistory.map(msg => {
+        //   let content = msg.content;
+        //   const codeBlockMatch = content.match(/```(?:\w+)?\n([\s\S]*?)```/);
+        //   if (codeBlockMatch) {
+        //     const codeOnly = codeBlockMatch[1];
+        //     content = content.split('```')[0].trim() + '<br/><pre><code class="language-js">' + codeOnly + '</code></pre>';
+        //   }
+        //   content = content.replace(/\n/g, '<br/>');
+        //   return `<div style="margin-bottom:1rem;"><strong>${msg.role === 'user' ? '👤 You' : '🤖 GalactusAI'}:</strong><br/>${content}</div>`;
+        // }).join('');
         hljs.highlightAll();
         // Auto-scroll to bottom after new reply
-        logDiv.scrollTop = logDiv.scrollHeight;
+        // logDiv.scrollTop = logDiv.scrollHeight;
 
       } catch (err) {
         console.error('GalactusAI Fetch Error:', err);
-        replyDiv.innerHTML = '❌ Error contacting GalactusAI.';
+        // If error, show error message in conversation log
+        const tempDiv = document.createElement('div');
+        tempDiv.style.marginBottom = '1rem';
+        tempDiv.innerHTML = `<strong>🤖 GalactusAI:</strong><br/><span style="color:red;">❌ Error contacting GalactusAI.</span>`;
+        logDiv.appendChild(tempDiv);
       }
     });
     document.getElementById('scrollToBottom').addEventListener('click', () => {
@@ -264,7 +264,6 @@
       conversationHistory.length = 0;
       localStorage.removeItem('galactus_live_history');
       document.getElementById('conversationLog').innerHTML = '';
-      document.getElementById('aiReply').innerHTML = '';
       document.getElementById('promptInput').value = '';
       const sidebar = document.getElementById("sidebar");
       if (sidebar.classList.contains("show")) {
@@ -364,7 +363,10 @@
             content = content.split('```')[0].trim() + '<br/><pre><code class="language-js">' + codeOnly + '</code></pre>';
           }
           content = content.replace(/\n/g, '<br/>');
-          return `<div style="margin-bottom:1rem;"><strong>${msg.role === 'user' ? '👤 You' : '🤖 GalactusAI'}:</strong><br/>${content}</div>`;
+          const bubbleStyle = msg.role === 'user'
+            ? 'background:#2e2e4d;color:#fff;padding:1rem;border-radius:12px 12px 0 12px;max-width:80%;margin-left:auto;margin-bottom:1rem;'
+            : 'background:#111;color:#0ff;padding:1rem;border-radius:12px 12px 12px 0;max-width:80%;margin-right:auto;margin-bottom:1rem;';
+          return `<div style="${bubbleStyle}">${content}</div>`;
         }).join('');
         hljs.highlightAll();
       }
