@@ -29,11 +29,6 @@
     <div class="container">
       <h1 data-text="Galactus AI">Galactus AI</h1>
       <p>Ready to build or reflect?</p>
-      <label for="modelSelector" style="margin-top: 1rem; display: block;">Choose Model:</label>
-      <select id="modelSelector" style="margin-bottom: 1rem;">
-        <option value="openai">OpenAI</option>
-        <option value="gemini">Gemini</option>
-      </select>
       <textarea id="promptInput" placeholder="Enter your cosmic question..." rows="4" style="width: 100%; padding: 1rem; margin-top: 1rem; border-radius: 8px; border: none;"></textarea>
       <button id="submitPrompt" class="button" style="margin-top: 1rem;">Submit to Galactus AI</button>
       
@@ -130,10 +125,6 @@
 
     // Conversation history for GalactusAI
     let conversationHistory = JSON.parse(localStorage.getItem('galactus_live_history') || '[]');
-    let selectedModel = 'openai';
-    document.getElementById('modelSelector').addEventListener('change', (e) => {
-      selectedModel = e.target.value;
-    });
 
     function persistHistory() {
       localStorage.setItem('galactus_live_history', JSON.stringify(conversationHistory));
@@ -186,7 +177,7 @@
         const res = await fetch(apiURL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ history: conversationHistory, model: selectedModel })
+          body: JSON.stringify({ history: conversationHistory })
         });
 
         const data = await res.json();

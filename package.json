@@ -21,7 +21,6 @@
   "homepage": "https://github.com/GalacTechNyc/galactusai#readme",
   "description": "",
   "dependencies": {
-    "@google/generative-ai": "^0.25.0",
     "openai": "^4.97.0"
   }
 }
