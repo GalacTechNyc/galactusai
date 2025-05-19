@@ -1,4 +1,3 @@
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).send("Only POST requests allowed");
@@ -18,16 +17,20 @@ export default async function handler(req, res) {
 
     const hfRes = await fetch(HF_API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      // If your backend expects different keys, adjust here.
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ data: [prompt] })
     });
 
-    const hfData = await hfRes.json();
+    // Try to parse JSON, but catch if it fails and dump the response text
+    let hfData;
+    try {
+      hfData = await hfRes.json();
+    } catch (parseErr) {
+      const raw = await hfRes.text();
+      console.error("❌ Failed to parse JSON. Raw response:", raw);
+      return res.status(502).json({ error: "Invalid response from HuggingFace", raw });
+    }
 
-    // Gradio Space responses usually have a { data: [...] } shape
     const reply = Array.isArray(hfData.data) ? hfData.data[0] : (hfData.reply || "No response");
 
     return res.status(200).json({ reply });
