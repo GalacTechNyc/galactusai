@@ -169,8 +169,9 @@
       logDiv.appendChild(userDiv);
       logDiv.scrollTop = logDiv.scrollHeight;
 
-      // Point API calls directly to your Hugging Face Space backend
-      const apiURL = 'https://galactus2-lora.hf.space/api/prompt';
+      const apiURL = window.location.hostname.includes('localhost')
+        ? 'http://localhost:5050/api/prompt'
+        : '/api/prompt';
 
       try {
         const res = await fetch(apiURL, {
