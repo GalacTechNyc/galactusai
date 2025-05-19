@@ -1,8 +1,3 @@
-import { OpenAI } from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -10,20 +5,34 @@ export default async function handler(req, res) {
   }
 
   const { history } = req.body;
-
-  if (!Array.isArray(history)) {
+  if (!Array.isArray(history) || history.length === 0) {
     return res.status(400).json({ error: "Missing or invalid 'history'" });
   }
 
+  // Combine chat history into a single prompt for the model.
+  const prompt = history.map(msg => msg.content).join("\n");
+
   try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: history,
+    // Hugging Face Space endpoint URL (replace if your Space is different)
+    const HF_API_URL = "https://hf.space/embed/GalacTechNyc/galactus2-lora/api/predict";
+
+    const hfRes = await fetch(HF_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      // If your backend expects different keys, adjust here.
+      body: JSON.stringify({ data: [prompt] })
     });
-    const reply = completion.choices[0].message.content;
+
+    const hfData = await hfRes.json();
+
+    // Gradio Space responses usually have a { data: [...] } shape
+    const reply = Array.isArray(hfData.data) ? hfData.data[0] : (hfData.reply || "No response");
+
     return res.status(200).json({ reply });
   } catch (err) {
-    console.error("❌ GalactusAI API error:", err);
+    console.error("❌ GalactusAI HuggingFace API error:", err);
     return res.status(500).json({ error: err.message || "GalactusAI failed to respond." });
   }
 }
